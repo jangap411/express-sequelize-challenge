@@ -1,10 +1,7 @@
 const express = require("express");
-const app = express();
+const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 const User = require("../models/User");
-
-//middleware
-// app.use(express.json());
 
 //create
 router.post("/create", async (req, res) => {
@@ -22,7 +19,9 @@ router.post("/create", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    // const usernamePost = req.body.username;
+    let data = {
+      username: username,
+    };
     console.log("\n\nusername:", username, "\n\n");
 
     const user = await User.findOne({
@@ -30,12 +29,15 @@ router.post("/login", async (req, res) => {
     });
 
     //creates the cookie that holds the UUID (the session ID)
+    let id = uuidv4();
+
     res.cookie("SID", id, {
       expires: new Date(Date.now() + 900000),
       httpOnly: true,
     });
+
     console.log(user);
-    res.render("pages/members");
+    res.render("pages/members", data);
   } catch (error) {
     console.log(error);
     res.render("pages/error");
