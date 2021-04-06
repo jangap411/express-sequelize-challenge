@@ -1,7 +1,6 @@
 # express-sequelize-challenge
 
 ### Deployment steps. 
-*`Note to Ryan`*
 
 1. Clone the repository from, `https://github.com/jangap411/express-sequelize-challenge.git` 
 2. And change directory into express-sequelize-challenge.
