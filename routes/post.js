@@ -1,7 +1,15 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
+const cookieParser = require("cookie-parser");
+const app = express();
 const router = express.Router();
 const User = require("../models/User");
+
+app.use(cookieParser());
+
+let data = {
+  message: "",
+};
 
 //create
 router.post("/create", async (req, res) => {
@@ -19,28 +27,35 @@ router.post("/create", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    let data = {
+    const whereUser = {
       username: username,
+      password: password,
     };
-    console.log("\n\nusername:", username, "\n\n");
 
     const user = await User.findOne({
-      where: { username: username } && { password: password },
+      where: whereUser,
     });
 
-    //creates the cookie that holds the UUID (the session ID)
-    let id = uuidv4();
+    if (user) {
+      data.message = username;
+      //creates the cookie that holds the UUID (the session ID)
+      let id = uuidv4();
 
-    res.cookie("SID", id, {
-      expires: new Date(Date.now() + 900000),
-      httpOnly: true,
-    });
+      res.cookie("SID", id, {
+        expires: new Date(Date.now() + 90000),
+        httpOnly: true,
+      });
 
-    console.log(user);
-    res.render("pages/members", data);
+      res.render("pages/members", data);
+    } else {
+      data.message = "Invalid username or password";
+      res.render("pages/error", data);
+    }
+
+    //
   } catch (error) {
-    console.log(error);
-    res.render("pages/error");
+    data.message = error;
+    res.redirect("pages/error", data);
   }
 });
 
